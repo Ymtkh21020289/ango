@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>昭和大学2008 生物アーカイブ - 暗号解読</title>
+    <style>
+        /* 全体のスタイル（暗号解読風のダークテーマ） */
+        body {
+            background-color: #0f172a; /* ダークブルー背景 */
+            color: #e2e8f0;
+            font-family: 'Courier New', Consolas, monospace; /* タイプライター風フォント */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 問題文を囲む中央のコンテナ */
+        #game-container {
+            background-color: #1e293b;
+            padding: 40px 50px;
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.15);
+            max-width: 800px;
+            width: 100%;
+            line-height: 2.2;
+            font-size: 1.15rem;
+            text-align: justify;
+        }
+
+        h1 {
+            text-align: center;
+            color: #10b981; /* ハッカーグリーン */
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 15px;
+        }
+
+        /* クリック可能な空欄のスタイル */
+        .blank {
+            display: inline-block;
+            background-color: #064e3b;
+            color: #34d399;
+            padding: 0 12px;
+            margin: 0 4px;
+            border: 1px solid #10b981;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            animation: pulse 2s infinite; /* 軽く点滅させる */
+        }
+
+        .blank:hover {
+            background-color: #047857;
+            box-shadow: 0 0 12px #10b981;
+            transform: scale(1.05);
+        }
+
+        /* 正解してテキストが埋め込まれた後のスタイル */
+        .solved {
+            display: inline;
+            color: #fbbf24; /* 正解はゴールドで強調 */
+            font-weight: bold;
+            border-bottom: 2px dashed #fbbf24;
+            padding: 0 4px;
+            margin: 0 2px;
+        }
+
+        /* 点滅アニメーション */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>【極秘アーカイブ：2008-Bio-Q1】</h1>
+        <p>
+            植物は光エネルギーを利用して、二酸化炭素と水から有機物を合成する。この働きを『 <span class="blank" data-id="A" data-answers='["光合成"]'>[ 暗号A ]</span> 』という。<br>
+            また、合成された有機物は細胞内で分解され、生命活動のエネルギー通貨と呼ばれる『 <span class="blank" data-id="B" data-answers='["ATP", "アデノシン三リン酸", "atp"]'>[ 暗号B ]</span> 』が生成される。<br>
+            近年、大気中の二酸化炭素などの増加により、地球全体の気温が上昇する『 <span class="blank" data-id="C" data-answers='["温室効果", "地球温暖化"]'>[ 暗号C ]</span> 』が進行し、生態系への影響が懸念されている。
+        </p>
+    </div>
+
+    <script>
+        // すべての空欄（.blankクラスを持つ要素）を取得
+        const blanks = document.querySelectorAll('.blank');
+
+        blanks.forEach(span => {
+            span.addEventListener('click', function() {
+                // すでに解読済みの場合は何もしない
+                if (this.classList.contains('solved')) return;
+
+                const id = this.getAttribute('data-id');
+                // HTMLに設定した正解リスト(JSON)を配列に変換
+                const answers = JSON.parse(this.getAttribute('data-answers'));
+                
+                // ブラウザ標準の入力ダイアログを表示
+                const userInput = prompt(`暗号 ${id} を解除するキーワードを入力せよ:`);
+                
+                // キャンセルされたり、空欄のままエンターを押された場合は処理を中断
+                if (userInput === null || userInput.trim() === "") {
+                    return; 
+                }
+
+                // 入力された文字と正解リストを照合（大文字・小文字は区別しない）
+                const isCorrect = answers.some(ans => ans.toLowerCase() === userInput.trim().toLowerCase());
+
+                if (isCorrect) {
+                    // 正解時の処理：見た目を変更し、入力された単語を埋め込む
+                    this.textContent = userInput;
+                    this.className = 'solved';
+                    
+                    // 全ての暗号が解除されたかチェック
+                    const remainingBlanks = document.querySelectorAll('.blank').length;
+                    if (remainingBlanks === 0) {
+                        // 最後の正解が画面に反映されるのを少し待ってからクリア表示
+                        setTimeout(() => {
+                            alert(">>> ミッションクリア！\nすべての暗号が解除され、データが復元されました。");
+                        }, 300);
+                    }
+                } else {
+                    // 不正解時の処理
+                    alert(">>> ERROR: キーワードが一致しません。文脈を再確認してください。");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
